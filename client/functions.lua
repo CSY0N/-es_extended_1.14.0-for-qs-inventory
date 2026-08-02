@@ -6,6 +6,9 @@ end
 
 ---@return table
 function ESX.GetPlayerData()
+    if Config.CustomInventory == 'qs' then
+        ESX.PlayerData.inventory = LocalPlayer.state.inventory
+    end
     return ESX.PlayerData
 end
 
@@ -30,7 +33,7 @@ function ESX.SecureNetEvent(name, func)
 
         local success, result = pcall(func, ...)
         if not success then
-            error(("%s"):format(result))
+            error(('%s'):format(result))
         end
     end)
     local eventIndex = #Core.Events[invokingResource] + 1
@@ -45,11 +48,11 @@ local addonResourcesState = {
 }
 
 local function IsResourceFound(resource)
-	return addonResourcesState[resource] or error(('Resource [^5%s^1] is Missing!'):format(resource))
+    return addonResourcesState[resource] or error(('Resource [^5%s^1] is Missing!'):format(resource))
 end
 
 function ESX.DisableSpawnManager()
-    if GetResourceState("spawnmanager") == "started" then
+    if GetResourceState('spawnmanager') == 'started' then
         exports.spawnmanager:setAutoSpawn(false)
     end
 end
@@ -60,7 +63,7 @@ end
 function ESX.SearchInventory(items, count)
     local item
     if type(items) == 'string' then
-        item, items = items, {items}
+        item, items = items, { items }
     end
 
     local data = {}
@@ -86,9 +89,9 @@ end
 function ESX.SetPlayerData(key, val)
     local current = ESX.PlayerData[key]
     ESX.PlayerData[key] = val
-    if key ~= "loadout" then
-        if type(val) == "table" or val ~= current then
-            TriggerEvent("esx:setPlayerData", key, val, current)
+    if key ~= 'loadout' then
+        if type(val) == 'table' or val ~= current then
+            TriggerEvent('esx:setPlayerData', key, val, current)
         end
     end
 end
@@ -114,7 +117,7 @@ end
 ---@return nil
 function ESX.SpawnPlayer(skin, coords, cb)
     local p = promise.new()
-    TriggerEvent("skinchanger:loadSkin", skin, function()
+    TriggerEvent('skinchanger:loadSkin', skin, function()
         p:resolve()
     end)
     Citizen.Await(p)
@@ -143,7 +146,7 @@ end
 ---@param options? ProgressBarOptions
 ---@return boolean Success Whether the progress bar was successfully created or not
 function ESX.Progressbar(message, length, options)
-	return IsResourceFound('esx_progressbar') and exports['esx_progressbar']:Progressbar(message, length, options)
+    return IsResourceFound('esx_progressbar') and exports['esx_progressbar']:Progressbar(message, length, options)
 end
 
 function ESX.CancelProgressbar()
@@ -157,16 +160,16 @@ end
 ---@param position? string The position of the notification
 ---@return nil
 function ESX.ShowNotification(message, notifyType, length, title, position)
-	return IsResourceFound('esx_notify') and exports['esx_notify']:Notify(notifyType or "info", length or 5000, message, title, position)
+    return IsResourceFound('esx_notify') and exports['esx_notify']:Notify(notifyType or 'info', length or 5000, message, title, position)
 end
 
 function ESX.TextUI(...)
-	return IsResourceFound('esx_textui') and exports['esx_textui']:TextUI(...)
+    return IsResourceFound('esx_textui') and exports['esx_textui']:TextUI(...)
 end
 
 ---@return nil
 function ESX.HideUI()
-	return IsResourceFound('esx_textui') and exports['esx_textui']:HideUI()
+    return IsResourceFound('esx_textui') and exports['esx_textui']:HideUI()
 end
 
 ---@param sender string
@@ -179,8 +182,8 @@ end
 ---@param hudColorIndex? integer
 ---@return nil
 function ESX.ShowAdvancedNotification(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
-    AddTextEntry("esxAdvancedNotification", msg)
-    BeginTextCommandThefeedPost("esxAdvancedNotification")
+    AddTextEntry('esxAdvancedNotification', msg)
+    BeginTextCommandThefeedPost('esxAdvancedNotification')
     if hudColorIndex then
         ThefeedSetNextPostBackgroundColor(hudColorIndex)
     end
@@ -194,11 +197,11 @@ end
 ---@param duration? number The duration of the message
 ---@return nil
 function ESX.ShowHelpNotification(msg, thisFrame, beep, duration)
-    AddTextEntry("esxHelpNotification", msg)
+    AddTextEntry('esxHelpNotification', msg)
     if thisFrame then
-        DisplayHelpTextThisFrame("esxHelpNotification", false)
+        DisplayHelpTextThisFrame('esxHelpNotification', false)
     else
-        BeginTextCommandDisplayHelp("esxHelpNotification")
+        BeginTextCommandDisplayHelp('esxHelpNotification')
         EndTextCommandDisplayHelp(0, false, beep == nil or beep, duration or -1)
     end
 end
@@ -207,10 +210,10 @@ end
 ---@param coords table The coords to show the message at
 ---@return nil
 function ESX.ShowFloatingHelpNotification(msg, coords)
-    AddTextEntry("esxFloatingHelpNotification", msg)
+    AddTextEntry('esxFloatingHelpNotification', msg)
     SetFloatingHelpTextWorldPosition(1, coords.x, coords.y, coords.z)
     SetFloatingHelpTextStyle(1, 1, 2, -1, 3, 0)
-    BeginTextCommandDisplayHelp("esxFloatingHelpNotification")
+    BeginTextCommandDisplayHelp('esxFloatingHelpNotification')
     EndTextCommandDisplayHelp(2, false, false, -1)
 end
 
@@ -288,7 +291,7 @@ function ESX.UI.Menu.Open(menuType, namespace, name, data, submit, cancel, chang
 
     menu.type = menuType
     menu.namespace = namespace
-    menu.resourceName = (GetInvokingResource() or "Unknown")
+    menu.resourceName = (GetInvokingResource() or 'Unknown')
     menu.name = name
     menu.data = data
     menu.submit = submit
@@ -379,7 +382,7 @@ function ESX.UI.Menu.Close(menuType, namespace, name, cancel)
                     local menu = ESX.UI.Menu.Opened[i]
                     ESX.UI.Menu.RegisteredTypes[menu.type].close(menu.namespace, menu.name)
 
-                    if type(menu.cancel) ~= "nil" then
+                    if type(menu.cancel) ~= 'nil' then
                         menu.cancel(menu.data, menu)
                     end
                 end
@@ -400,7 +403,7 @@ function ESX.UI.Menu.CloseAll(cancel)
                 local menu = ESX.UI.Menu.Opened[i]
                 ESX.UI.Menu.RegisteredTypes[menu.type].close(menu.namespace, menu.name)
 
-                if type(menu.cancel) ~= "nil" then
+                if type(menu.cancel) ~= 'nil' then
                     menu.cancel(menu.data, menu)
                 end
             end
@@ -436,7 +439,7 @@ ESX.UI.Menu.IsOpen = ESX.UI.Menu.GetOpened
 ---@return nil
 function ESX.UI.ShowInventoryItemNotification(add, item, count)
     SendNUIMessage({
-        action = "inventoryNotification",
+        action = 'inventoryNotification',
         add = add,
         item = item,
         count = count,
@@ -449,7 +452,7 @@ end
 ---@param font? number The font of the text
 ---@return nil
 function ESX.Game.Utils.DrawText3D(coords, text, size, font)
-    local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+    local vector = type(coords) == 'vector3' and coords or vec(coords.x, coords.y, coords.z)
 
     local camCoords = GetFinalRenderedCamCoord()
     local distance = #(vector - camCoords)
@@ -465,7 +468,7 @@ function ESX.Game.Utils.DrawText3D(coords, text, size, font)
     SetTextFont(font)
     SetTextProportional(true)
     SetTextColour(255, 255, 255, 215)
-    BeginTextCommandDisplayText("STRING")
+    BeginTextCommandDisplayText('STRING')
     SetTextCentre(true)
     AddTextComponentSubstringPlayerName(text)
     SetDrawOrigin(vector.x, vector.y, vector.z, 0)
@@ -498,7 +501,7 @@ RegisterNetEvent('esx:showAdvancedNotification', ESX.ShowAdvancedNotification)
 
 RegisterNetEvent('esx:showHelpNotification', ESX.ShowHelpNotification)
 
-AddEventHandler("onResourceStop", function(resourceName)
+AddEventHandler('onResourceStop', function(resourceName)
     for i = 1, #ESX.UI.Menu.Opened, 1 do
         if ESX.UI.Menu.Opened[i] then
             if ESX.UI.Menu.Opened[i].resourceName == resourceName or ESX.UI.Menu.Opened[i].namespace == resourceName then
@@ -510,45 +513,45 @@ AddEventHandler("onResourceStop", function(resourceName)
 end)
 -- Credits to txAdmin for the list.
 local mismatchedTypes = {
-    [`airtug`] = "automobile", -- trailer
-    [`avisa`] = "submarine", -- boat
-    [`blimp`] = "heli", -- plane
-    [`blimp2`] = "heli", -- plane
-    [`blimp3`] = "heli", -- plane
-    [`caddy`] = "automobile", -- trailer
-    [`caddy2`] = "automobile", -- trailer
-    [`caddy3`] = "automobile", -- trailer
-    [`chimera`] = "automobile", -- bike
-    [`docktug`] = "automobile", -- trailer
-    [`forklift`] = "automobile", -- trailer
-    [`kosatka`] = "submarine", -- boat
-    [`mower`] = "automobile", -- trailer
-    [`policeb`] = "bike", -- automobile
-    [`ripley`] = "automobile", -- trailer
-    [`rrocket`] = "automobile", -- bike
-    [`sadler`] = "automobile", -- trailer
-    [`sadler2`] = "automobile", -- trailer
-    [`scrap`] = "automobile", -- trailer
-    [`slamtruck`] = "automobile", -- trailer
-    [`Stryder`] = "automobile", -- bike
-    [`submersible`] = "submarine", -- boat
-    [`submersible2`] = "submarine", -- boat
-    [`thruster`] = "heli", -- automobile
-    [`towtruck`] = "automobile", -- trailer
-    [`towtruck2`] = "automobile", -- trailer
-    [`tractor`] = "automobile", -- trailer
-    [`tractor2`] = "automobile", -- trailer
-    [`tractor3`] = "automobile", -- trailer
-    [`trailersmall2`] = "trailer", -- automobile
-    [`utillitruck`] = "automobile", -- trailer
-    [`utillitruck2`] = "automobile", -- trailer
-    [`utillitruck3`] = "automobile", -- trailer
+    [`airtug`] = 'automobile',       -- trailer
+    [`avisa`] = 'submarine',         -- boat
+    [`blimp`] = 'heli',              -- plane
+    [`blimp2`] = 'heli',             -- plane
+    [`blimp3`] = 'heli',             -- plane
+    [`caddy`] = 'automobile',        -- trailer
+    [`caddy2`] = 'automobile',       -- trailer
+    [`caddy3`] = 'automobile',       -- trailer
+    [`chimera`] = 'automobile',      -- bike
+    [`docktug`] = 'automobile',      -- trailer
+    [`forklift`] = 'automobile',     -- trailer
+    [`kosatka`] = 'submarine',       -- boat
+    [`mower`] = 'automobile',        -- trailer
+    [`policeb`] = 'bike',            -- automobile
+    [`ripley`] = 'automobile',       -- trailer
+    [`rrocket`] = 'automobile',      -- bike
+    [`sadler`] = 'automobile',       -- trailer
+    [`sadler2`] = 'automobile',      -- trailer
+    [`scrap`] = 'automobile',        -- trailer
+    [`slamtruck`] = 'automobile',    -- trailer
+    [`Stryder`] = 'automobile',      -- bike
+    [`submersible`] = 'submarine',   -- boat
+    [`submersible2`] = 'submarine',  -- boat
+    [`thruster`] = 'heli',           -- automobile
+    [`towtruck`] = 'automobile',     -- trailer
+    [`towtruck2`] = 'automobile',    -- trailer
+    [`tractor`] = 'automobile',      -- trailer
+    [`tractor2`] = 'automobile',     -- trailer
+    [`tractor3`] = 'automobile',     -- trailer
+    [`trailersmall2`] = 'trailer',   -- automobile
+    [`utillitruck`] = 'automobile',  -- trailer
+    [`utillitruck2`] = 'automobile', -- trailer
+    [`utillitruck3`] = 'automobile', -- trailer
 }
 
 ---@param model number|string
 ---@return string | boolean
 function ESX.GetVehicleTypeClient(model)
-    model = type(model) == "string" and joaat(model) or model
+    model = type(model) == 'string' and joaat(model) or model
     if not IsModelInCdimage(model) then
         return false
     end
@@ -563,16 +566,16 @@ function ESX.GetVehicleTypeClient(model)
 
     local vehicleType = GetVehicleClassFromName(model)
     local types = {
-        [8] = "bike",
-        [11] = "trailer",
-        [13] = "bike",
-        [14] = "boat",
-        [15] = "heli",
-        [16] = "plane",
-        [21] = "train",
+        [8] = 'bike',
+        [11] = 'trailer',
+        [13] = 'bike',
+        [14] = 'boat',
+        [15] = 'heli',
+        [16] = 'plane',
+        [21] = 'train',
     }
 
-    return types[vehicleType] or "automobile"
+    return types[vehicleType] or 'automobile'
 end
 
 ESX.GetVehicleType = ESX.GetVehicleTypeClient
